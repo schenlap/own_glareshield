@@ -2,9 +2,9 @@
 Self made glareshield for winwing fcu
 
 ## Setup ##
- 1. git submodul init
- 2. cd i2c-ch341-usb
- 3. make
+ 1. `git submodul init`
+ 2. `cd i2c-ch341-usb`
+ 3. `make`
 
 ## Startup ##
  1. `sudo modprobe i2c-dev`
