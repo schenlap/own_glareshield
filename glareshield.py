@@ -128,16 +128,6 @@ glare_device = None # usb /dev/inputx device
 datacache = {}
 ledtest = False
 
-# List of datarefs without led connection to request.
-# Text Dataref format:  <MCDU[1,2]><Line[title/label/cont/etc]><Linenumber[1...6]><Color[a,b,m,s,w,y]>.
-# We must read all 25 Bytes per dataref!
-array_datarefs = [
-    #("AirbusFBW/MCDU1titleb", None),
-    ("AirbusFBW/MCDU1titleg", None),
-    ("AirbusFBW/MCDU1titles", None),
-    ("AirbusFBW/MCDU1titlew", None),
-  ]
-
 datarefs = [
     ("AirbusFBW/AnnunMode", None) # 0 .. dim, 1 .. bright, 2 .. test
   ]
@@ -166,16 +156,7 @@ def RequestDataRefs(xp, config):
             print(f"register dataref {b.dataref}")
             xp.AddDataRef(b.dataref, 3)
             dataref_cnt += 1
-    #print(f"register array datarefs ", end='' )
-    #for d in array_datarefs:
-    #    for i in range(PAGE_CHARS_PER_LINE):
-    #        freq = d[1]
-    #        if freq == None:
-    #            freq = 2
-    #        xp.AddDataRef(dataref_switch_mcdu(d[0]+'['+str(i)+']', config), freq)
-    #        dataref_cnt += 1
-    #        if dataref_cnt % 100 == 0:
-    #            print(".", end='', flush=True)
+
 
     print("")
     for d in datarefs:
@@ -266,7 +247,6 @@ def glare_create_events(usb_mgr):
             set_datacache(usb_mgr, values.copy())
             values_processed.set()
             sleep(0.005)
-            #print('#', end='', flush=True) # TEST1: should print many '#' in console
             try:
                 data_in = usb_mgr.device.port
                 #print(f"data_in: {data_in}")
@@ -277,13 +257,11 @@ def glare_create_events(usb_mgr):
             if len(data_in) != 16:
                 print(f'rx data count {len(data_in)} not valid')
                 continue
-            #print(f"data_in: {data_in}")
 
             #create button bit-pattern
             buttons = 0
             for i in range(12):
                 buttons |= (not data_in[i]) << i
-            #print(hex(buttons)) # TEST2: you should see a difference when pressing buttons
             for i in range (BUTTONS_CNT):
                 mask = 0x01 << i
                 if xor_bitmask(buttons, buttons_last, mask):
@@ -336,18 +314,8 @@ def set_datacache(usb_mgr, values):
             print(f'cache: v:{v} val:{int(values[v])}')
             datacache[v] = int(values[v])
             set_button_led_lcd(usb_mgr.device, v, int(values[v]))
-    if new == True or usb_retry == True:
 
-        #if True:
-        #    try: # dataref may not be received already, even when connected
-        #        exped_led_state_desired = datacache['AirbusFBW/APVerticalMode'] >= 112
-        #    except:
-        #        exped_led_state_desired = False
-        #    if exped_led_state_desired != exped_led_state:
-        #        exped_led_state = exped_led_state_desired
-        #        glare_set_led(usb_mgr.device, Leds.EXPED_GREEN, led_brightness * exped_led_state_desired)
-
-        sleep(0.05)
+    sleep(0.05)
 
 
 def kb_wait_quit_event():
@@ -403,9 +371,6 @@ def main():
         usb_mgr.connect_device(vid=vid, pid=pid, i2c_port_num=14, pcf_address=0x20)
 
     print('compatible with X-Plane 11/12 and all Toliss Airbus')
-
-    #display_mgr = DisplayManager(usb_mgr.device)
-    #display_mgr.startupscreen(new_version)
 
     create_button_list_mcdu()
 
