@@ -1,0 +1,6 @@
+[submodule "PCF8575"]
+	path = PCF8575
+	url = https://github.com/rp3tya/PCF8575.git
+[submodule "i2c-ch341-usb"]
+	path = i2c-ch341-usb
+	url = https://github.com/allanbian1017/i2c-ch341-usb.git
